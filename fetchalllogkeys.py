@@ -16,11 +16,11 @@ if __name__ == "__main__":
     elif not os.path.exists(args.out):
         os.mkdir(args.out)
 
-    logs = requests.get("https://www.certificate-transparency.org/known-logs/all_logs_list.json?attredirects=0&d=1")
+    logs = requests.get("https://www.gstatic.com/ct/log_list/all_logs_list.json?attredirects=0&d=1")
     logs = json.loads(logs.text)
     for l in logs['logs']:
         name = l['description'].replace(" ", "_").replace("'", "")
-        url = "https://" + l['url'] + "/"
+        url = "https://" + l['url']
         key = l['key']
        
         keyout = os.path.join(args.out, name + ".pem")

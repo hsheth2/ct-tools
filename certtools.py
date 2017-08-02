@@ -4,9 +4,10 @@
 import subprocess
 import json
 import base64
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 import urllib
 import urllib2
-import ssl
 import urlparse
 import struct
 import sys
@@ -95,6 +96,8 @@ class sslparameters:
 def create_ssl_context(cafile=None):
     try:
         sslparameters.sslcontext = ssl.create_default_context(cafile=cafile)
+        sslparameters.sslcontext.check_hostname = False
+        sslparameters.sslcontext.verify_mode = ssl.CERT_NONE
     except AttributeError:
         sslparameters.sslcontext = None
 
@@ -137,7 +140,10 @@ def pyopenssl_https_get(url):
     return response_lines[len(response_lines) - 1]
 
 def get_sth(baseurl):
-    result = urlopen(baseurl + "ct/v1/get-sth").read()
+    print baseurl
+    url = baseurl + "ct/v1/get-sth"
+    print url
+    result = urlopen(url).read()
     return json.loads(result)
 
 def get_proof_by_hash(baseurl, hash, tree_size):

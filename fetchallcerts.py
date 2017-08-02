@@ -5,6 +5,8 @@
 # See LICENSE for licensing information.
 
 import argparse
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 import urllib2
 import urllib
 import json
@@ -116,7 +118,6 @@ else:
     zf = None
     for entry, i in itertools.izip(entries, itertools.count(ncerts)):
         try:
-            (chain, timestamp, issuer_key_hash) = extract_original_entry(entry)
             zipfilename = args.store + "/" + ("%04d.zip" % (i / 10000))
             if zipfilename != currentfilename:
                 if zf:
@@ -124,6 +125,10 @@ else:
                 zf = zipfile.ZipFile(zipfilename, "a",
                                      compression=zipfile.ZIP_DEFLATED)
                 currentfilename = zipfilename
+            if ("%08d" % i) in zf.namelist():
+                # print "Already downloaded"
+                continue
+            (chain, timestamp, issuer_key_hash) = extract_original_entry(entry)
             s = ""
             s += "Timestamp: %s\n" % timestamp
             leaf_input = base64.decodestring(entry["leaf_input"])
